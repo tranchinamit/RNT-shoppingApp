@@ -1,17 +1,20 @@
 import React from 'react';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Platform } from "react-native";
+
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
-import Colors from '../constants/Colors';
+import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
+import CartScreen from '../screens/shop/CartScreen';
+
+import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../utils/helpers';
+import HeaderButton from '../components/UI/HeaderButton';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+
 
 
 const ProductsNavigator = createStackNavigator();
 
-const colorBasedOnOS = Platform.OS !== "ios" ? "white" : Colors.primary;
-const colorBgBasedOnOS = Platform.OS !== "ios" ? Colors.primary : "white";
-
-export default ({ drawerNavigation }) => {
+export default () => {
   return (
     <NavigationContainer>
       <ProductsNavigator.Navigator
@@ -22,41 +25,48 @@ export default ({ drawerNavigation }) => {
           },
           headerTintColor: colorBasedOnOS,
           headerTitleStyle: {
-            fontWeight: "bold",
+            fontFamily: 'open-sans-bold'
           },
+          headerBackTitleStyle: {
+            fontFamily: 'open-sans'
+          }
         }}
       >
         <ProductsNavigator.Screen
-          name="ProductsOverviewScreen"
+          name="All Products"
           component={ProductsOverviewScreen}
-        // options={{
-        //   headerLeft: () => (
-        //     <IconButton
-        //       icon={{
-        //         name: "menu",
-        //         size: 28,
-        //         color: colorBasedOnOS,
-        //         solid: true,
-        //       }}
-        //       type="clear"
-        //       onPress={() => drawerNavigation.toggleDrawer()}
-        //     />
-        //   ),
-        // }}
+          options={({ navigation, route }) => ({
+            headerRight: () => (
+              <HeaderButtons HeaderButtonComponent={HeaderButton}>
+                <Item
+                  title="Cart"
+                  iconName={bAndroidOS ? 'md-cart' : 'ios-cart'}
+                  onPress={() => {
+                    navigation.navigate('CartScreen')
+                  }}
+                />
+              </HeaderButtons>
+            ),
+          })}
         />
-        {/* <Stack.Screen
-          name="CategoryMeals"
-          component={CategoryMealsScreen}
-          options={{ title: "Category Meals" }}
-        /> */}
+        <ProductsNavigator.Screen
+          name="ProductDetail"
+          component={ProductDetailScreen}
+          options={{ title: "Product Detail" }}
+        />
+        <ProductsNavigator.Screen
+          name="CartScreen"
+          component={CartScreen}
+          options={{ title: "Cart" }}
+        />
         {/* Other way pass props */}
         {/* <ProductsNavigator.Screen
-          name="MealDetails"
+          name="ProductDetail"
           options={{
             title: "Meal Details - id...",
           }}
         >
-          {(props) => <MealDetailsScreen {...props} extraData={"extraData"} />}
+          {(props) => <ProductDetailScreen {...props} extraData={"extraData"} />}
         </ProductsNavigator.Screen> */}
       </ProductsNavigator.Navigator>
     </NavigationContainer>
