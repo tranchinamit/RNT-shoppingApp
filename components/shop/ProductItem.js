@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { TouchableCmp } from '../../utils/helpers';
+import Card from '../UI/Card';
 
 export default ({ fSelect, ...props }) => {
   const { imageUrl, title, price, id } = props;
   return (
-    <View style={styles.product}>
+    <Card style={styles.product}>
       <View style={styles.touchable}>
         <TouchableCmp onPress={fSelect} useForeground>
           <View>
@@ -20,19 +21,12 @@ export default ({ fSelect, ...props }) => {
           </View>
         </TouchableCmp>
       </View>
-    </View>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   product: {
-    shadowColor: 'black',
-    shadowOpacity: 0.26,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 5,
-    borderRadius: 10,
-    backgroundColor: 'white',
     height: 300,
     margin: 20,
   },
@@ -53,7 +47,7 @@ const styles = StyleSheet.create({
   },
   details: {
     alignItems: 'center',
-    height: '15%',
+    height: '18%',
     padding: 5,
   },
   title: {
@@ -70,7 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: '25%',
+    height: '22%',
     paddingHorizontal: 20,
   },
 });

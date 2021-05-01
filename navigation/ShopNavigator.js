@@ -12,6 +12,7 @@ import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
 import CartScreen from '../screens/shop/CartScreen';
 import OrderScreen from '../screens/shop/OrderScreen';
 import UserProductScreen from '../screens/user/UserProductScreen';
+import EditProductScreen from '../screens/user/EditProductScreen';
 
 import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../utils/helpers';
 import HeaderButton from '../components/UI/HeaderButton';
@@ -19,7 +20,6 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 import Colors from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
-import { clockRunning } from 'react-native-reanimated';
 
 const Stack = createStackNavigator();
 
@@ -254,24 +254,38 @@ const AdminNavigation = () => {
               />
             </HeaderButtons>
           ),
-          // headerRight: () => (
-          //   <HeaderButtons HeaderButtonComponent={HeaderButton}>
-          //     <Item
-          //       title="Cart"
-          //       iconName={bAndroidOS ? 'md-cart' : 'ios-cart'}
-          //       onPress={() => {
-          //         navigation.navigate('CartScreen');
-          //       }}
-          //     />
-          //   </HeaderButtons>
-          // ),
+          headerRight: () => (
+            <HeaderButtons HeaderButtonComponent={HeaderButton}>
+              <Item
+                title="Add"
+                iconName={bAndroidOS ? 'md-create' : 'ios-create'}
+                onPress={() => {
+                  navigation.navigate('EditProduct');
+                }}
+              />
+            </HeaderButtons>
+          ),
         })}
       />
-      {/* <AdminNavigator.Screen
-        name="ProductDetail"
-        component={ProductDetailScreen}
-        options={{ title: 'Product Detail' }}
-      /> */}
+      <AdminNavigator.Screen
+        name="EditProduct"
+        component={EditProductScreen}
+        options={({ navigation, route }) => ({
+          title: route?.params?.id ? 'Edit Product' : 'Add Product',
+          headerRight: () => {
+            const submitFn = route?.params?.submit;
+            return (
+              <HeaderButtons HeaderButtonComponent={HeaderButton}>
+                <Item
+                  title="Save"
+                  iconName={bAndroidOS ? 'md-checkmark' : 'ios-checkmark'}
+                  onPress={submitFn}
+                />
+              </HeaderButtons>
+            );
+          },
+        })}
+      />
     </AdminNavigator.Navigator>
   );
 };

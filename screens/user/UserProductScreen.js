@@ -1,18 +1,28 @@
 import React from 'react';
-import { FlatList, Button } from 'react-native';
+import { FlatList, Button, Alert } from 'react-native';
 import ProductItem from '../../components/shop/ProductItem';
 import Colors from '../../constants/Colors';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteProduct } from '../../store/actions/products';
 
 export default ({ navigation }) => {
   const { userProducts } = useSelector((state) => state.products);
 
-  const handleViewDetail = (objIdTitle) => {
-    navigation.navigate('ProductDetail', objIdTitle);
+  const dispatch = useDispatch();
+
+  const handleEdit = (id) => {
+    navigation.navigate('EditProduct', { id });
   };
 
-  const handleAddToCart = (objProduct) => {
-    dispatch(addToCart(objProduct));
+  const handleDelete = (id) => {
+    dispatch(deleteProduct({ id }));
+  };
+
+  const deleteHandler = (id) => {
+    Alert.alert('Are you sure?', 'Do you really want to delete this item?', [
+      { text: 'No', style: 'default' },
+      { text: ' Yes', style: 'destructive', onPress: () => handleDelete(id) },
+    ]);
   };
 
   return (
@@ -20,21 +30,16 @@ export default ({ navigation }) => {
       data={userProducts}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <ProductItem {...item} fSelect={() => {}}>
+        <ProductItem {...item} fSelect={() => handleEdit(item.id)}>
           <Button
             color={Colors.primary}
             title="Edit"
-            onPress={() =>
-              handleEdit({
-                id: itemData.item.id,
-                title: itemData.item.title,
-              })
-            }
+            onPress={() => handleEdit(item.id)}
           />
           <Button
             color={Colors.primary}
             title="Delete"
-            onPress={() => handleDelete(itemData.item)}
+            onPress={() => deleteHandler(item.id)}
           />
         </ProductItem>
       )}
