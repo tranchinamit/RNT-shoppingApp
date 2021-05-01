@@ -1,14 +1,23 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Button, ScrollView, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Button,
+  ScrollView,
+  FlatList,
+} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import Colors from '../../constants/Colors';
 import CartItem from '../../components/shop/CartItem';
 import { removeFromCart } from '../../store/actions/cart';
+import { addOrder } from '../../store/actions/orders';
 
 export default () => {
   const dispatch = useDispatch();
-  const totalAmount = useSelector(state => state.cart.totalAmount);
-  const arrItems = useSelector(state => {
+  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const arrItems = useSelector((state) => {
     const rs = [];
     for (const key in state.cart.items) {
       rs.push({
@@ -17,7 +26,7 @@ export default () => {
         price: state.cart.items[key].price,
         quantity: state.cart.items[key].quantity,
         sum: state.cart.items[key].sum,
-      })
+      });
     }
     return rs;
     // return rs.sort((a, b) => a.id > b.id);
@@ -26,32 +35,44 @@ export default () => {
 
   const handleRemove = (id) => {
     console.log(id);
-    dispatch(removeFromCart({ id }))
-  }
+    dispatch(removeFromCart({ id }));
+  };
+
+  const handleOrder = () => {
+    dispatch(addOrder({ items: arrItems, totalAmount }));
+  };
 
   return (
     <View style={styles.screen}>
       <View style={styles.summary}>
-        <Text style={styles.summaryText}>Total:
-        <Text style={styles.summaryAmount}>${totalAmount > 0 ? totalAmount?.toFixed(2) : `0.00`}</Text>
+        <Text style={styles.summaryText}>
+          Total:
+          <Text style={styles.summaryAmount}>
+            ${totalAmount > 0 ? totalAmount?.toFixed(2) : `0.00`}
+          </Text>
         </Text>
-        <Button color={Colors.accent} title="Order Now" disabled={!arrItems.length} />
+        <Button
+          color={Colors.accent}
+          title="Order Now"
+          disabled={!arrItems.length}
+          onPress={handleOrder}
+        />
       </View>
       <View>
         <FlatList
           data={arrItems}
-          keyExtractor={item => item.id}
-          renderItem={itemData =>
+          keyExtractor={(item) => item.id}
+          renderItem={(itemData) => (
             <CartItem
               {...itemData.item}
               fRemove={({ id }) => handleRemove(id)}
             />
-          }
+          )}
         />
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   screen: { margin: 20 },
@@ -74,7 +95,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   summaryAmount: {
-    color: Colors.primary
+    color: Colors.primary,
   },
-})
-
+});

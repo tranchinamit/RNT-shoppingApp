@@ -1,34 +1,39 @@
 import CartItem from '../../models/cart-item';
 import { ADD_TO_CART, REMOVE_FROM_CART } from '../actions/cart';
+import { ADD_ORDER } from '../actions/orders';
 
 const cartItems = {
-  "p3": {
-    "price": 8.99,
-    "quantity": 1,
-    "sum": 8.99,
-    "title": "Coffee Mug",
-
-  }, "p2": {
-    "price": 99.99,
-    "quantity": 4,
-    "sum": 399.96,
-    "title": "Blue Carpet",
-  }, "p5": {
-    "price": 2299.99,
-    "quantity": 2,
-    "sum": 4599.98,
-    "title": "PowerBook",
-  }, "p4": {
-    "price": 15.99,
-    "quantity": 3,
-    "sum": 47.97,
-    "title": "The Book - Limited Edition",
-  }
+  p3: {
+    price: 8.99,
+    quantity: 1,
+    sum: 8.99,
+    title: 'Coffee Mug',
+  },
+  p2: {
+    price: 99.99,
+    quantity: 4,
+    sum: 399.96,
+    title: 'Blue Carpet',
+  },
+  p5: {
+    price: 2299.99,
+    quantity: 2,
+    sum: 4599.98,
+    title: 'PowerBook',
+  },
+  p4: {
+    price: 15.99,
+    quantity: 3,
+    sum: 47.97,
+    title: 'The Book - Limited Edition',
+  },
 };
 
 const initialState = {
-  items: cartItems,
-  totalAmount: 5056.9,
+  // items: cartItems,
+  // totalAmount: 5056.9,
+  items: {},
+  totalAmount: 0,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -42,8 +47,8 @@ export default (state = initialState, { type, payload }) => {
           state.items[id].quantity + 1,
           price,
           title,
-          state.items[id].sum + price
-        )
+          state.items[id].sum + price,
+        );
       } else {
         // do not exist in the cart, => add new
         updatedOrNewCartItem = new CartItem(1, price, title, price);
@@ -51,7 +56,7 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         items: { ...state.items, [id]: updatedOrNewCartItem },
-        totalAmount: state.totalAmount + price
+        totalAmount: state.totalAmount + price,
       };
     case REMOVE_FROM_CART:
       const prodId = payload.id;
@@ -64,9 +69,9 @@ export default (state = initialState, { type, payload }) => {
         const tempObj = {
           ...selectedCartItem,
           quantity: selectedCartItem.quantity - 1,
-          sum: selectedCartItem.sum - selectedCartItem.price
-        }
-        updatedOrDeleteCartItem = { ...state.items, [prodId]: tempObj }
+          sum: selectedCartItem.sum - selectedCartItem.price,
+        };
+        updatedOrDeleteCartItem = { ...state.items, [prodId]: tempObj };
       } else {
         // quantity === 1, delete item
         updatedOrDeleteCartItem = { ...state.items };
@@ -76,9 +81,11 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         items: updatedOrDeleteCartItem,
-        totalAmount: state.totalAmount - selectedCartItem.price
+        totalAmount: state.totalAmount - selectedCartItem.price,
       };
+    case ADD_ORDER:
+      return initialState;
     default:
       return state;
   }
-}
+};

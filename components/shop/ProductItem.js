@@ -1,15 +1,13 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Button, TouchableOpacity, TouchableNativeFeedback } from 'react-native';
-import Colors from '../../constants/Colors';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { TouchableCmp } from '../../utils/helpers';
 
-export default ({ fViewDetail, fAddToCart, ...props }) => {
-
+export default ({ fSelect, ...props }) => {
   const { imageUrl, title, price, id } = props;
   return (
     <View style={styles.product}>
       <View style={styles.touchable}>
-        <TouchableCmp onPress={() => fViewDetail({ id, title })} >
+        <TouchableCmp onPress={fSelect} useForeground>
           <View>
             <View style={styles.imageContainer}>
               <Image style={styles.image} source={{ uri: imageUrl }} />
@@ -18,16 +16,13 @@ export default ({ fViewDetail, fAddToCart, ...props }) => {
               <Text style={styles.title}>{title}</Text>
               <Text style={styles.price}>${price?.toFixed(2)}</Text>
             </View>
-            <View style={styles.actions}>
-              <Button color={Colors.primary} title="View Details" onPress={() => fViewDetail({ id, title })} />
-              <Button color={Colors.primary} title="To Cart" onPress={() => fAddToCart(props)} />
-            </View>
+            <View style={styles.actions}>{props.children}</View>
           </View>
         </TouchableCmp>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   product: {
@@ -50,7 +45,7 @@ const styles = StyleSheet.create({
     height: '60%',
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   image: {
     width: '100%',
@@ -64,18 +59,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     marginVertical: 2,
-    fontFamily: 'open-sans-bold'
+    fontFamily: 'open-sans-bold',
   },
   price: {
     fontSize: 14,
     color: '#888',
-    fontFamily: 'open-sans'
+    fontFamily: 'open-sans',
   },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     height: '25%',
-    paddingHorizontal: 20
-  }
-})
+    paddingHorizontal: 20,
+  },
+});
