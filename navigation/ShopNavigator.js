@@ -94,15 +94,15 @@ const LeftDrawerNavigation = () => {
           },
           style: { margin: 12 },
         }}
-        // drawerStyle={
-        // {
-        // backgroundColor: "#c6cbef",
-        // width: 240,
-        // }
-        // }
-        // 2 options below work together
-        // hideStatusBar={true}
-        // statusBarAnimation={true}
+      // drawerStyle={
+      // {
+      // backgroundColor: "#c6cbef",
+      // width: 240,
+      // }
+      // }
+      // 2 options below work together
+      // hideStatusBar={true}
+      // statusBarAnimation={true}
       >
         <Drawer.Screen
           name="Product"
@@ -272,18 +272,18 @@ const AdminNavigation = () => {
         component={EditProductScreen}
         options={({ navigation, route }) => ({
           title: route?.params?.id ? 'Edit Product' : 'Add Product',
-          headerRight: () => {
-            const submitFn = route?.params?.submit;
-            return (
-              <HeaderButtons HeaderButtonComponent={HeaderButton}>
-                <Item
-                  title="Save"
-                  iconName={bAndroidOS ? 'md-checkmark' : 'ios-checkmark'}
-                  onPress={submitFn}
-                />
-              </HeaderButtons>
-            );
-          },
+          // headerRight: () => {
+          //   const submitFn = route?.params?.submit;
+          //   return (
+          //     <HeaderButtons HeaderButtonComponent={HeaderButton}>
+          //       <Item
+          //         title="Save"
+          //         iconName={bAndroidOS ? 'md-checkmark' : 'ios-checkmark'}
+          //         onPress={() => submitFn ? submitFn() : {}}
+          //       />
+          //     </HeaderButtons>
+          //   );
+          // },
         })}
       />
     </AdminNavigator.Navigator>

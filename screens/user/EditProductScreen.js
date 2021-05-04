@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useReducer, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,40 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProduct, updateProduct } from '../../store/actions/products';
-// import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-// import HeaderButton from '../../components/UI/HeaderButton';
-// import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../../utils/helpers';
+import Input from '../../components/UI/Input';
+
+import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../..//utils/helpers';
+import HeaderButton from '../../components/UI/HeaderButton';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+
+const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
+
+const formReducer = (state, { type, input, value, isValid }) => {
+  if (type === FORM_INPUT_UPDATE) {
+
+    const updatedValues = {
+      ...state.inputValues,
+      [input]: value
+    }
+
+    const updatedValidities = {
+      ...state.inputValues,
+      [input]: isValid
+    }
+
+    let updatedFormIsValid = true;
+    for (const key in updatedValidities) {
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
+    }
+
+    return {
+      inputValues: updatedValues,
+      inputValidities: updatedValidities,
+      formIsValid: updatedFormIsValid
+    };
+  }
+  return state;
+}
 
 export default ({ navigation, route }) => {
   const prodId = route?.params?.id;
@@ -21,107 +52,139 @@ export default ({ navigation, route }) => {
     state.products.userProducts.find((prod) => prod.id === prodId),
   );
 
-  const [szTitle, setTitle] = useState(editedProduct?.title || '');
-  const [szImageUrl, setImageUrl] = useState(editedProduct?.imageUrl || '');
-  const [szPrice, setPrice] = useState(editedProduct?.price || '');
-  const [szDescription, setDescription] = useState(
-    editedProduct?.description || '',
-  );
-
-  // React.useLayoutEffect(() => {
-  //   navigation.setOptions({
-  //     headerRight: () => {
-  //       return (
-  //         <HeaderButtons HeaderButtonComponent={HeaderButton}>
-  //           <Item
-  //             title="Save"
-  //             iconName={bAndroidOS ? 'md-checkmark' : 'ios-checkmark'}
-  //             onPress={() => {
-  //               console.log('submie here');
-  //             }}
-  //           />
-  //         </HeaderButtons>
-  //       );
-  //     },
-  //   });
-  // }, [navigation]);
+  const [formState, dispatchFormState] = useReducer(formReducer, {
+    inputValues: {
+      title: editedProduct?.title || '',
+      imageUrl: editedProduct?.imageUrl || '',
+      description: editedProduct?.description || '',
+      price: editedProduct?.price || ''
+    },
+    inputValidities: {
+      title: !!editedProduct,
+      imageUrl: !!editedProduct,
+      description: !!editedProduct,
+      price: !!editedProduct,
+    },
+    formIsValid: !!editedProduct
+  });
 
   const submitHandler = useCallback(() => {
+
+    if (!formState.formIsValid) {
+      Alert.alert('Wrong input!', 'Please check the error in the form', [{ text: 'Okay', style: 'default' }])
+      return;
+    }
+
+    const { title, price, description, imageUrl } = formState.inputValues;
     if (editedProduct) {
       dispatch(
         updateProduct({
           id: prodId,
-          title: szTitle,
-          description: szDescription,
-          imageUrl: szImageUrl,
+          title,
+          description,
+          imageUrl
         }),
       );
     } else {
       dispatch(
         createProduct({
-          price: +szPrice,
-          title: szTitle,
-          description: szDescription,
-          imageUrl: szImageUrl,
+          price: +price,
+          title,
+          description,
+          imageUrl
         }),
       );
     }
     navigation.goBack();
   }, [
-    navigation,
     dispatch,
     prodId,
-    szTitle,
-    szPrice,
-    szImageUrl,
-    szDescription,
+    formState
   ]);
 
-  useEffect(() => {
-    navigation.setParams({ submit: submitHandler });
-  }, [submitHandler]);
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <HeaderButtons HeaderButtonComponent={HeaderButton}>
+            <Item
+              title="Save"
+              iconName={bAndroidOS ? 'md-checkmark' : 'ios-checkmark'}
+              onPress={submitHandler}
+            />
+          </HeaderButtons>
+        );
+      },
+    });
+  }, [navigation, submitHandler]);
+
+  // useEffect(() => {
+  //   navigation.setParams({ submit: () => submitHandler() });
+  // }, [submitHandler]);
+
+  const inputChangeHandler = useCallback((inputIdentifier, text, isValid) => {
+    dispatchFormState({
+      type: FORM_INPUT_UPDATE,
+      input: inputIdentifier,
+      value: text,
+      isValid,
+    });
+  }, [dispatchFormState]);
 
   return (
     <ScrollView>
       <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Title</Text>
-          <TextInput
-            style={styles.input}
-            // enterKeyHint="abc"
-            value={szTitle}
-            onChangeText={(text) => setTitle(text)}
-          />
-        </View>
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Image URL</Text>
-          <TextInput
-            style={styles.input}
-            // enterKeyHint="abc"
-            value={szImageUrl}
-            onChangeText={(text) => setImageUrl(text)}
-          />
-        </View>
+        <Input
+          id="title"
+          label='Title'
+          errorText="Please enter a valid title!"
+          keyboardType='default'
+          autoCapitalize='sentences'
+          autoCorrect
+          returnKeyType='next'
+          onInputChange={inputChangeHandler}
+          initialValue={editedProduct?.title || ''}
+          initiallyValid={!!editedProduct}
+        />
+
+        <Input
+          id="imageUrl"
+          label="Image Url"
+          errorText="Please enter a valid image Url!"
+          keyboardType='default'
+          returnKeyType='next'
+          onInputChange={inputChangeHandler}
+          initialValue={editedProduct?.imageUrl || ''}
+          initiallyValid={!!editedProduct}
+        />
+
         {editedProduct ? null : (
-          <View style={styles.formControl}>
-            <Text style={styles.label}>Price</Text>
-            <TextInput
-              style={styles.input}
-              // enterKeyHint="abc"
-              value={szPrice}
-              onChangeText={(text) => setPrice(text)}
-            />
-          </View>
-        )}
-        <View style={styles.formControl}>
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={styles.input}
-            // enterKeyHint="abc"
-            value={szDescription}
-            onChangeText={(text) => setDescription(text)}
+          <Input
+            id="price"
+            label='Price'
+            errorText="Please enter a valid price!"
+            keyboardType='decimal-pad'
+            autoCapitalize='sentences'
+            autoCorrect
+            returnKeyType='next'
+            onInputChange={inputChangeHandler}
+            initialValue={editedProduct?.price || ''}
+            initiallyValid={!!editedProduct}
           />
-        </View>
+        )}
+        <Input
+          id="description"
+          label='Description'
+          errorText="Please enter a valid description!"
+          keyboardType='default'
+          autoCapitalize='sentences'
+          autoCorrect
+          multiline
+          numberOfLines={3}
+          onInputChange={inputChangeHandler}
+          initialValue={editedProduct?.description || ''}
+          initiallyValid={!!editedProduct}
+        />
       </View>
     </ScrollView>
   );
@@ -130,18 +193,5 @@ export default ({ navigation, route }) => {
 const styles = StyleSheet.create({
   form: {
     margin: 20,
-  },
-  formControl: {
-    width: '100%',
-  },
-  label: {
-    fontFamily: 'open-sans-bold',
-    marginVertical: 8,
-  },
-  input: {
-    paddingVertical: 5,
-    paddingHorizontal: 2,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
   },
 });
