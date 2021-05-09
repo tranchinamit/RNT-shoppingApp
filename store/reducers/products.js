@@ -4,15 +4,21 @@ import {
   CREATE_PRODUCT,
   DELETE_PRODUCT,
   UPDATE_PRODUCT,
+  SET_PRODUCTS
 } from '../actions/products';
 
 const initialState = {
-  availableProducts: PRODUCT,
-  userProducts: PRODUCT.filter((prod) => prod.ownerId === 'u1'),
+  availableProducts: [],
+  userProducts: [],
 };
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+    case SET_PRODUCTS:
+      return {
+        availableProducts: payload,
+        userProducts: payload.filter((prod) => prod.ownerId === 'u1'),
+      }
     case DELETE_PRODUCT:
       const { id } = payload;
       return {
@@ -23,7 +29,7 @@ export default (state = initialState, { type, payload }) => {
     case CREATE_PRODUCT:
       console.log(payload);
       const newProduct = new Product(
-        new Date().toString(),
+        payload.id,
         'u1',
         payload.title,
         payload.imageUrl,

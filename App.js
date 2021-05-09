@@ -1,11 +1,11 @@
 // import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { createStore, combineReducers } from 'redux';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import AppLoading from "expo-app-loading";
 import { useFonts } from 'expo-font';
+import ReduxThunk from 'redux-thunk';
 
 import ShopNavigator from './navigation/ShopNavigator';
 
@@ -19,7 +19,10 @@ const rootReducer = combineReducers({
   order: orderReducer
 });
 
-const store = createStore(rootReducer, composeWithDevTools());
+const store = createStore(
+  rootReducer,
+  composeWithDevTools(applyMiddleware(ReduxThunk)),
+);
 
 export default function App() {
   let [fontsLoaded] = useFonts({
