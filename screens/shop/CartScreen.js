@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   Button,
-  ScrollView,
   FlatList,
+  ActivityIndicator
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import Colors from '../../constants/Colors';
@@ -32,6 +31,9 @@ export default () => {
     return rs;
     // return rs.sort((a, b) => a.id > b.id);
   });
+  const [isLoading, setLoading] = useState(false);
+
+
   console.log(arrItems);
 
   const handleRemove = (id) => {
@@ -39,8 +41,14 @@ export default () => {
     dispatch(removeFromCart({ id }));
   };
 
-  const handleOrder = () => {
-    dispatch(addOrder({ items: arrItems, totalAmount }));
+  const handleOrder = async () => {
+    setLoading(true)
+    try {
+      await dispatch(addOrder({ items: arrItems, totalAmount }));
+    } catch (err) {
+      console.log(err);
+    }
+    setLoading(false);
   };
 
   return (
@@ -55,12 +63,16 @@ export default () => {
               : `0.00`}
           </Text>
         </Text>
-        <Button
-          color={Colors.accent}
-          title="Order Now"
-          disabled={!arrItems.length}
-          onPress={handleOrder}
-        />
+        {isLoading ? (
+          <ActivityIndicator size="large" color={Colors.primary} />
+        ) : (
+          <Button
+            color={Colors.accent}
+            title="Order Now"
+            disabled={!arrItems.length}
+            onPress={handleOrder}
+          />
+        )}
       </Card>
       <View>
         <FlatList

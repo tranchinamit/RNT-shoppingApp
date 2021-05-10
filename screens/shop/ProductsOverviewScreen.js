@@ -9,24 +9,26 @@ import Colors from '../../constants/Colors';
 export default ({ navigation }) => {
   const dispatch = useDispatch();
   const { availableProducts } = useSelector((state) => state.products);
+  const [isRefreshing, setRefreshing] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
 
   const loadedProducts = useCallback(async () => {
     setError(null);
-    setLoading(true);
+    setRefreshing(true);
     try {
       await dispatch(fetchProducts());
     } catch (err) {
       setError(err.message)
     }
-    setLoading(false);
-  }, [dispatch, setLoading, setError]);
+    setRefreshing(false);
+  }, [dispatch, setError, setRefreshing]);
 
   // Run one time on start
   useEffect(() => {
-    loadedProducts();
-  }, [loadedProducts])
+    setLoading(true);
+    loadedProducts().then(() => { setLoading(false) });
+  }, [loadedProducts, setLoading])
 
   const handleViewDetail = (objIdTitle) => {
     navigation.navigate('ProductDetail', objIdTitle);
@@ -64,6 +66,8 @@ export default ({ navigation }) => {
 
   return (
     <FlatList
+      onRefresh={loadedProducts}
+      refreshing={isRefreshing}
       data={availableProducts}
       keyExtractor={(item) => item.id}
       renderItem={(itemData) => (
@@ -99,5 +103,9 @@ export default ({ navigation }) => {
 
 
 const styles = StyleSheet.create({
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' }
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 })

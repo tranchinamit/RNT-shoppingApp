@@ -1,17 +1,18 @@
-import React, { useCallback, useEffect, useReducer, useLayoutEffect } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
   Alert,
-  TextInput,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProduct, updateProduct } from '../../store/actions/products';
 import Input from '../../components/UI/Input';
+import Colors from '../../constants/Colors';
 
-import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../..//utils/helpers';
+import { bAndroidOS } from '../..//utils/helpers';
 import HeaderButton from '../../components/UI/HeaderButton';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
@@ -47,6 +48,8 @@ const formReducer = (state, { type, input, value, isValid }) => {
 export default ({ navigation, route }) => {
   const prodId = route?.params?.id;
   const dispatch = useDispatch();
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState();
 
   const editedProduct = useSelector((state) =>
     state.products.userProducts.find((prod) => prod.id === prodId),
@@ -68,7 +71,13 @@ export default ({ navigation, route }) => {
     formIsValid: !!editedProduct
   });
 
-  const submitHandler = useCallback(() => {
+  useEffect(() => {
+    if (error) {
+      Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
+    }
+  }, [error])
+
+  const submitHandler = useCallback(async () => {
 
     if (!formState.formIsValid) {
       Alert.alert('Wrong input!', 'Please check the error in the form', [{ text: 'Okay', style: 'default' }])
@@ -76,26 +85,34 @@ export default ({ navigation, route }) => {
     }
 
     const { title, price, description, imageUrl } = formState.inputValues;
-    if (editedProduct) {
-      dispatch(
-        updateProduct({
-          id: prodId,
-          title,
-          description,
-          imageUrl
-        }),
-      );
-    } else {
-      dispatch(
-        createProduct({
-          price: +price,
-          title,
-          description,
-          imageUrl
-        }),
-      );
+    setError(null);
+    setLoading(true);
+    try {
+      if (editedProduct) {
+        await dispatch(
+          updateProduct({
+            id: prodId,
+            title,
+            description,
+            imageUrl
+          }),
+        );
+      } else {
+        await dispatch(
+          createProduct({
+            price: +price,
+            title,
+            description,
+            imageUrl
+          }),
+        );
+      }
+      navigation.goBack();
+    } catch (err) {
+      setError(err.message);
     }
-    navigation.goBack();
+    setLoading(false);
+
   }, [
     dispatch,
     prodId,
@@ -130,6 +147,14 @@ export default ({ navigation, route }) => {
       isValid,
     });
   }, [dispatchFormState]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    )
+  }
 
   return (
     <KeyboardAvoidingView
@@ -198,27 +223,27 @@ export default ({ navigation, route }) => {
             minLength={5}
           />
 
-          <TextInput
-            style={styles.input}
-          />
-          <TextInput
-            style={styles.input}
-          />
-          <TextInput
-            style={styles.input}
-          />
-          <TextInput
-            style={styles.input}
-          />
-          <TextInput
-            style={styles.input}
-          />
-          <TextInput
-            style={styles.input}
-          />
-          <TextInput
-            style={styles.input}
-          />
+          {/* <TextInput
+              style={styles.input}
+            />
+            <TextInput
+              style={styles.input}
+            />
+            <TextInput
+              style={styles.input}
+            />
+            <TextInput
+              style={styles.input}
+            />
+            <TextInput
+              style={styles.input}
+            />
+            <TextInput
+              style={styles.input}
+            />
+            <TextInput
+              style={styles.input}
+            /> */}
 
         </View>
       </ScrollView>
@@ -229,10 +254,16 @@ export default ({ navigation, route }) => {
 const styles = StyleSheet.create({
   form: {
     margin: 20,
+    flex: 1,
   },
   input: {
     height: 40,
     margin: 12,
     borderWidth: 1,
   },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 });

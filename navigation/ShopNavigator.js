@@ -6,18 +6,19 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-
+import { createAppContainer } from 'react-navigation';
+import createAnimatedSwitchNavigator from 'react-navigation-animated-switch';
+import { Transition } from 'react-native-reanimated';
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
 import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
 import CartScreen from '../screens/shop/CartScreen';
 import OrderScreen from '../screens/shop/OrderScreen';
 import UserProductScreen from '../screens/user/UserProductScreen';
 import EditProductScreen from '../screens/user/EditProductScreen';
-
+import AuthScreen from '../screens/user/AuthScreen';
 import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../utils/helpers';
 import HeaderButton from '../components/UI/HeaderButton';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-
 import Colors from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -225,7 +226,6 @@ const AdminNavigator = createStackNavigator();
 const AdminNavigation = () => {
   return (
     <AdminNavigator.Navigator
-      // initialRouteName="Categories"
       screenOptions={{
         headerStyle: {
           backgroundColor: colorBgBasedOnOS,
@@ -272,24 +272,62 @@ const AdminNavigation = () => {
         component={EditProductScreen}
         options={({ navigation, route }) => ({
           title: route?.params?.id ? 'Edit Product' : 'Add Product',
-          // headerRight: () => {
-          //   const submitFn = route?.params?.submit;
-          //   return (
-          //     <HeaderButtons HeaderButtonComponent={HeaderButton}>
-          //       <Item
-          //         title="Save"
-          //         iconName={bAndroidOS ? 'md-checkmark' : 'ios-checkmark'}
-          //         onPress={() => submitFn ? submitFn() : {}}
-          //       />
-          //     </HeaderButtons>
-          //   );
-          // },
         })}
       />
     </AdminNavigator.Navigator>
   );
 };
 
-export default () => {
-  return <LeftDrawerNavigation />;
+const AuthNavigator = createStackNavigator();
+
+const AuthNavigation = () => {
+  return (
+    <NavigationContainer>
+      <AuthNavigator.Navigator
+        screenOptions={{
+          // headerStyle: {
+          //   backgroundColor: colorBgBasedOnOS,
+          // },
+          // headerTintColor: colorBasedOnOS,
+          headerTitleStyle: {
+            fontFamily: 'open-sans-bold',
+            textAlign: 'center'
+          },
+          // headerBackTitleStyle: {
+          //   fontFamily: 'open-sans',
+          // },
+          headerTitle: 'Authenticate'
+        }}
+      >
+        <AuthNavigator.Screen
+          name="Auth"
+          component={AuthScreen}
+        />
+      </AuthNavigator.Navigator>
+    </NavigationContainer>
+  );
 };
+
+const MainNavigator = createAnimatedSwitchNavigator(
+  {
+    Auth: AuthNavigation,
+    Shop: LeftDrawerNavigation,
+  },
+  {
+    transition: (
+      <Transition.Together>
+        <Transition.Out
+          type="slide-bottom"
+          durationMs={400}
+          interpolation="easeIn"
+        />
+        <Transition.In type="fade" durationMs={500} />
+      </Transition.Together>
+    ),
+  }
+);
+
+export default createAppContainer(MainNavigator);
+// export default () => {
+//   return <MySwitch />;
+// };

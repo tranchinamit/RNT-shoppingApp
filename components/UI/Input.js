@@ -27,8 +27,7 @@ const inputReducer = (state, { type, value, isValid }) => {
   }
 }
 
-export default (props) => {
-  const { id, label, errorText, initialValue, initiallyValid, onInputChange } = props;
+export default ({ id, label, errorText, initialValue, initiallyValid, onInputChange, ...props }) => {
 
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: initialValue || '',
@@ -39,7 +38,7 @@ export default (props) => {
 
   useEffect(() => {
     // if (inputState.touched) {
-    onInputChange(id, inputState.value, inputState.isValid);
+      onInputChange(id, inputState.value, inputState.isValid);
     // }
   }, [inputState, onInputChange, id]);
 
