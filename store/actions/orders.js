@@ -1,13 +1,14 @@
 import Order from '../../models/order';
-import { ORDER_URL } from '../../services/index';
+import { CREATE_ORDER_URL, GET_ORDER_URL } from '../../services/index';
 
 export const ADD_ORDER = "ADD_ORDER";
 export const SET_ORDERS = "SET_ORDERS";
 
-export const fetchOrders = () => async dispatch => {
+export const fetchOrders = () => async (dispatch, getState) => {
+  const userId = getState().auth.userId;
   try {
     // calling API
-    const res = await fetch(ORDER_URL);
+    const res = await fetch(GET_ORDER_URL(userId));
 
     // catch err
     if (!res.ok) {
@@ -40,11 +41,13 @@ export const fetchOrders = () => async dispatch => {
   }
 }
 
-export const addOrder = (payload) => async dispatch => {
+export const addOrder = (payload) => async (dispatch, getState) => {
+  const token = getState().auth.token;
+  const userId = getState().auth.userId;
   try {
     const szDate = new Date();
     // calling API
-    const res = await fetch(ORDER_URL, {
+    const res = await fetch(CREATE_ORDER_URL(token, userId), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

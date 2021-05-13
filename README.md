@@ -15,3 +15,13 @@
 ## Animated-switch
 
 `https://github.com/react-navigation/animated-switch/blob/master/example/src/index.tsx`
+## Storage
+
+`https://github.com/sunnylqm/react-native-storage`
+
+
+### Bugs
+  log-out android
+
+### Learning
+  auto logout: setimeout ????

@@ -4,11 +4,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
-  DrawerItemList,
+  DrawerItemList, DrawerItem
 } from '@react-navigation/drawer';
 import { createAppContainer } from 'react-navigation';
 import createAnimatedSwitchNavigator from 'react-navigation-animated-switch';
 import { Transition } from 'react-native-reanimated';
+
 import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
 import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
 import CartScreen from '../screens/shop/CartScreen';
@@ -16,11 +17,29 @@ import OrderScreen from '../screens/shop/OrderScreen';
 import UserProductScreen from '../screens/user/UserProductScreen';
 import EditProductScreen from '../screens/user/EditProductScreen';
 import AuthScreen from '../screens/user/AuthScreen';
+import StartupScreen from '../screens/StartupScreen';
+
 import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../utils/helpers';
 import HeaderButton from '../components/UI/HeaderButton';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import Colors from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import { Text } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/actions/auth';
+
+const defaultNavOptions = {
+  headerStyle: {
+    backgroundColor: colorBgBasedOnOS
+  },
+  headerTitleStyle: {
+    fontFamily: 'open-sans-bold'
+  },
+  headerBackTitleStyle: {
+    fontFamily: 'open-sans'
+  },
+  headerTintColor: colorBasedOnOS
+};
 
 const Stack = createStackNavigator();
 
@@ -28,9 +47,20 @@ const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const LeftDrawerContent = (props) => {
+  const dispatch = useDispatch();
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView {...props} >
       <DrawerItemList {...props} />
+      <DrawerItem
+        label={() => <Text style={{ color: Colors.primary, fontFamily: 'open-sans-bold', fontSize: 18 }}>Logout</Text>}
+        onPress={async () => { await dispatch(logout()); props.mainNavigation.navigate('Auth') }}
+        style={{ paddingLeft: 40, marginTop: 10 }}
+        icon={() => <Ionicons
+          name={bAndroidOS ? 'md-log-out-outline' : 'ios-log-out-outline'}
+          size={23}
+          color={Colors.primary}
+        />}
+      />
       {/* <DrawerItem
         label="Close drawer"
         onPress={() => props.navigation.closeDrawer()}
@@ -46,15 +76,7 @@ const LeftDrawerContent = (props) => {
 const OrderNavigation = () => {
   return (
     <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colorBgBasedOnOS,
-        },
-        headerTintColor: colorBasedOnOS,
-        headerTitleStyle: {
-          fontFamily: 'open-sans-bold',
-        },
-      }}
+      screenOptions={defaultNavOptions}
     >
       <Stack.Screen
         name="Your Order"
@@ -77,11 +99,11 @@ const OrderNavigation = () => {
   );
 };
 
-const LeftDrawerNavigation = () => {
+const LeftDrawerNavigation = ({ navigation }) => {
   return (
     <NavigationContainer>
       <Drawer.Navigator
-        drawerContent={(props) => <LeftDrawerContent {...props} />}
+        drawerContent={(props) => <LeftDrawerContent {...props} mainNavigation={navigation} />}
         drawerContentOptions={{
           activeTintColor: Colors.primary,
           activeBackgroundColor: 'lightgray',
@@ -95,6 +117,7 @@ const LeftDrawerNavigation = () => {
           },
           style: { margin: 12 },
         }}
+        content
       // drawerStyle={
       // {
       // backgroundColor: "#c6cbef",
@@ -156,18 +179,7 @@ const ProductNavigation = () => {
   return (
     <ProductNavigator.Navigator
       // initialRouteName="Categories"
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colorBgBasedOnOS,
-        },
-        headerTintColor: colorBasedOnOS,
-        headerTitleStyle: {
-          fontFamily: 'open-sans-bold',
-        },
-        headerBackTitleStyle: {
-          fontFamily: 'open-sans',
-        },
-      }}
+      screenOptions={defaultNavOptions}
     >
       <ProductNavigator.Screen
         name="All Products"
@@ -226,18 +238,7 @@ const AdminNavigator = createStackNavigator();
 const AdminNavigation = () => {
   return (
     <AdminNavigator.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colorBgBasedOnOS,
-        },
-        headerTintColor: colorBasedOnOS,
-        headerTitleStyle: {
-          fontFamily: 'open-sans-bold',
-        },
-        headerBackTitleStyle: {
-          fontFamily: 'open-sans',
-        },
-      }}
+      screenOptions={defaultNavOptions}
     >
       <AdminNavigator.Screen
         name="Your Product"
@@ -278,39 +279,31 @@ const AdminNavigation = () => {
   );
 };
 
-const AuthNavigator = createStackNavigator();
+// const AuthNavigator = createStackNavigator();
 
-const AuthNavigation = () => {
-  return (
-    <NavigationContainer>
-      <AuthNavigator.Navigator
-        screenOptions={{
-          // headerStyle: {
-          //   backgroundColor: colorBgBasedOnOS,
-          // },
-          // headerTintColor: colorBasedOnOS,
-          headerTitleStyle: {
-            fontFamily: 'open-sans-bold',
-            textAlign: 'center'
-          },
-          // headerBackTitleStyle: {
-          //   fontFamily: 'open-sans',
-          // },
-          headerTitle: 'Authenticate'
-        }}
-      >
-        <AuthNavigator.Screen
-          name="Auth"
-          component={AuthScreen}
-        />
-      </AuthNavigator.Navigator>
-    </NavigationContainer>
-  );
-};
+// const AuthNavigation = ({ navigation }) => {
+//   return (
+//     <NavigationContainer>
+//       <AuthNavigator.Navigator
+//         screenOptions={{
+//           ...defaultNavOptions,
+//           headerTitleAlign: 'center',
+//           headerTitle: 'Authenticate'
+//         }}
+//       >
+//         <Drawer.Screen name="Auth">
+//           {() => <AuthScreen switchNavigation={navigation} />}
+//         </Drawer.Screen>
+//       </AuthNavigator.Navigator>
+//     </NavigationContainer>
+//   );
+// };
 
 const MainNavigator = createAnimatedSwitchNavigator(
   {
-    Auth: AuthNavigation,
+    // Auth: AuthNavigation,
+    // Startup: StartupScreen,
+    Auth: AuthScreen,
     Shop: LeftDrawerNavigation,
   },
   {
@@ -328,6 +321,3 @@ const MainNavigator = createAnimatedSwitchNavigator(
 );
 
 export default createAppContainer(MainNavigator);
-// export default () => {
-//   return <MySwitch />;
-// };

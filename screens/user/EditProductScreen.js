@@ -110,8 +110,8 @@ export default ({ navigation, route }) => {
       navigation.goBack();
     } catch (err) {
       setError(err.message);
+      setLoading(false);
     }
-    setLoading(false);
 
   }, [
     dispatch,

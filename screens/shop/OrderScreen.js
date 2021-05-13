@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { Text, View, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import OrderItem from '../../components/shop/OrderItem';
 import { fetchOrders } from '../../store/actions/orders';
@@ -25,18 +25,16 @@ export default () => {
 
   // Run one time on start
   useEffect(() => {
-    loadedOrders();
-  }, [loadedOrders])
+    loadedOrders().then(() => { setLoading(false) });
+  }, [loadedOrders, setLoading])
 
 
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text>An error occurred!</Text>
-        <Button title="Try again!" onPress={loadedOrders} color={Colors.primary} />
-      </View>
-    )
-  }
+  useEffect(() => {
+    if (error) {
+      Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
+    }
+  }, [error])
+
   if (isLoading) {
     return (
       <View style={styles.centered}>
@@ -49,7 +47,7 @@ export default () => {
     return (
       <View style={styles.centered}>
         <Text>
-          No orders founds. Maybe start order some!
+          No orders founds. Maybe start order some products!
         </Text>
       </View>
     )

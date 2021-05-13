@@ -16,8 +16,8 @@ export default (state = initialState, { type, payload }) => {
   switch (type) {
     case SET_PRODUCTS:
       return {
-        availableProducts: payload,
-        userProducts: payload.filter((prod) => prod.ownerId === 'u1'),
+        availableProducts: payload.availableProducts,
+        userProducts: payload.userProducts,
       }
     case DELETE_PRODUCT:
       const { id } = payload;
@@ -30,7 +30,7 @@ export default (state = initialState, { type, payload }) => {
       console.log(payload);
       const newProduct = new Product(
         payload.id,
-        'u1',
+        payload.ownerId,
         payload.title,
         payload.imageUrl,
         payload.description,

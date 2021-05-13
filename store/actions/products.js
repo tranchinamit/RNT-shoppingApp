@@ -1,15 +1,18 @@
 import Product from '../../models/product';
-import { PRODUCT_URL, UPDATE_PRODUCT_URL } from '../../services/index';
+import { GET_PRODUCT_URL, CREATE_PRODUCT_URL, UPDATE_PRODUCT_URL } from '../../services/index';
 
 export const DELETE_PRODUCT = 'DELETE_PRODUCT';
 export const CREATE_PRODUCT = 'CREATE_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const SET_PRODUCTS = 'SET_PRODUCTS';
 
-export const fetchProducts = (payload) => async dispatch => {
+export const fetchProducts = (payload) => async (dispatch, getState) => {
   try {
+    // get OwnerId
+    const userId = getState().auth.userId;
+
     // calling API
-    const res = await fetch(PRODUCT_URL);
+    const res = await fetch(GET_PRODUCT_URL());
 
 
     // catch err
@@ -27,7 +30,7 @@ export const fetchProducts = (payload) => async dispatch => {
       loadedProducts.push(
         new Product(
           key,
-          'u1',
+          resData[key].ownerId,
           resData[key].title,
           resData[key].imageUrl,
           resData[key].description,
@@ -37,7 +40,13 @@ export const fetchProducts = (payload) => async dispatch => {
     }
 
     // store into redux
-    return dispatch({ type: SET_PRODUCTS, payload: loadedProducts });
+    return dispatch({
+      type: SET_PRODUCTS,
+      payload: {
+        availableProducts: loadedProducts,
+        userProducts: loadedProducts.filter(prod => prod.ownerId === userId)
+      }
+    });
   } catch (err) {
     // send to custom analytics server
     console.log(err);
@@ -70,15 +79,19 @@ export const deleteProduct = (payload) => async dispatch => {
 
 
 
-export const createProduct = (payload) => async dispatch => {
+export const createProduct = (payload) => async (dispatch, getState) => {
+  const token = getState().auth.token;
+  const userId = getState().auth.userId;
+
   // any async code you want!
-  const res = await fetch(PRODUCT_URL, {
+  const res = await fetch(CREATE_PRODUCT_URL(token), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       ...payload,
+      ownerId: userId
     })
   });
 
@@ -92,10 +105,14 @@ export const createProduct = (payload) => async dispatch => {
   return dispatch({ type: CREATE_PRODUCT, payload: { id: resData.name, ...payload } });
 };
 
-export const updateProduct = (payload) => async dispatch => {
+export const updateProduct = (payload) => async (dispatch, getState) => {
+
+  const token = getState().auth.token;
+  const userId = getState().auth.userId;
+
   try {
     // calling API
-    const res = await fetch(UPDATE_PRODUCT_URL(payload.id), {
+    const res = await fetch(UPDATE_PRODUCT_URL(token, payload.id), {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -104,7 +121,8 @@ export const updateProduct = (payload) => async dispatch => {
         // title, description, imageUrl, price
         title: payload.title,
         description: payload.description,
-        imageUrl: payload.imageUrl
+        imageUrl: payload.imageUrl,
+        ownerId: userId
       })
     });
 

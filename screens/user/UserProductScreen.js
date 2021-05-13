@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Button, Alert } from 'react-native';
+import { FlatList, Button, Alert, Text, View } from 'react-native';
 import ProductItem from '../../components/shop/ProductItem';
 import Colors from '../../constants/Colors';
 import { useSelector, useDispatch } from 'react-redux';
@@ -24,6 +24,18 @@ export default ({ navigation }) => {
       { text: ' Yes', style: 'destructive', onPress: () => handleDelete(id) },
     ]);
   };
+
+  if (userProducts.length === 0) {
+    return (
+      <View style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <Text>No products found, maybe start creating some!</Text>
+      </View>
+    )
+  }
 
   return (
     <FlatList

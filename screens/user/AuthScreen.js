@@ -44,7 +44,7 @@ const formReducer = (state, { type, input, value, isValid }) => {
   return state;
 }
 
-export default () => {
+export default ({ navigation }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
@@ -70,7 +70,7 @@ export default () => {
   }, [error])
 
   const authHandler = async () => {
-    setError(null);
+    // navigation.navigate('Shop');
 
     const { email, password } = formState.inputValues;
     let action;
@@ -80,18 +80,19 @@ export default () => {
         password
       });
     } else {
-      action = signIn({
-        email,
-        password
-      });
+      action = signIn({ email, password });
     }
+
+    setError(null);
     setLoading(true);
     try {
       await dispatch(action);
+      // switchNavigation.navigate('Shop');
+      navigation.navigate('Shop');
     } catch (err) {
       setError(err.message);
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   const inputChangeHandler = useCallback((inputIdentifier, text, isValid) => {
