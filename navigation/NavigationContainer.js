@@ -16,7 +16,7 @@ export default () => {
       )
     }
     return () => { };
-  }, [isAuth, dispatch])
+  }, [isAuth])
 
   // useEffect(() => {
   //   if (!isAuth) {
