@@ -6,7 +6,7 @@ import {
   DrawerContentScrollView,
   DrawerItemList, DrawerItem
 } from '@react-navigation/drawer';
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import createAnimatedSwitchNavigator from 'react-navigation-animated-switch';
 import { Transition } from 'react-native-reanimated';
 
@@ -53,7 +53,13 @@ const LeftDrawerContent = (props) => {
       <DrawerItemList {...props} />
       <DrawerItem
         label={() => <Text style={{ color: Colors.primary, fontFamily: 'open-sans-bold', fontSize: 18 }}>Logout</Text>}
-        onPress={async () => { await dispatch(logout()); props.mainNavigation.navigate('Auth') }}
+        onPress={async () => {
+          try {
+            await dispatch(logout());
+          } catch (err) {
+            console.log(err);
+          }
+        }}
         style={{ paddingLeft: 40, marginTop: 10 }}
         icon={() => <Ionicons
           name={bAndroidOS ? 'md-log-out-outline' : 'ios-log-out-outline'}
@@ -279,30 +285,28 @@ const AdminNavigation = () => {
   );
 };
 
-// const AuthNavigator = createStackNavigator();
-
-// const AuthNavigation = ({ navigation }) => {
-//   return (
-//     <NavigationContainer>
-//       <AuthNavigator.Navigator
-//         screenOptions={{
-//           ...defaultNavOptions,
-//           headerTitleAlign: 'center',
-//           headerTitle: 'Authenticate'
-//         }}
-//       >
-//         <Drawer.Screen name="Auth">
-//           {() => <AuthScreen switchNavigation={navigation} />}
-//         </Drawer.Screen>
-//       </AuthNavigator.Navigator>
-//     </NavigationContainer>
-//   );
-// };
-
 const MainNavigator = createAnimatedSwitchNavigator(
   {
-    // Auth: AuthNavigation,
-    // Startup: StartupScreen,
+    Startup: StartupScreen,
+    Auth: AuthScreen,
+    Shop: LeftDrawerNavigation,
+  },
+  {
+    transition: (
+      <Transition.Together>
+        <Transition.Out
+          type="slide-bottom"
+          durationMs={400}
+          interpolation="easeIn"
+        />
+        <Transition.In type="fade" durationMs={500} />
+      </Transition.Together>
+    ),
+  }
+);
+const MainNavigatorAndroid = createSwitchNavigator(
+  {
+    Startup: StartupScreen,
     Auth: AuthScreen,
     Shop: LeftDrawerNavigation,
   },
@@ -320,4 +324,5 @@ const MainNavigator = createAnimatedSwitchNavigator(
   }
 );
 
-export default createAppContainer(MainNavigator);
+// Android can run with createSwitchNavigator. So, this is the solution
+export default createAppContainer(bAndroidOS ? MainNavigatorAndroid : MainNavigator);

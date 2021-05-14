@@ -27,7 +27,7 @@ export default (state = initialState, { type, payload }) => {
         availableProducts: state.availableProducts.filter((prod) => prod.id !== id),
       };
     case CREATE_PRODUCT:
-      console.log(payload);
+      // console.log(payload);
       const newProduct = new Product(
         payload.id,
         payload.ownerId,
@@ -36,7 +36,7 @@ export default (state = initialState, { type, payload }) => {
         payload.description,
         payload.price,
       );
-      console.log(newProduct);
+      // console.log(newProduct);
 
       return {
         ...state,

@@ -7,7 +7,7 @@ import Card from '../UI/Card';
 export default (props) => {
   const { amount, date, items } = props;
   const [bShowDetails, setShowDetails] = useState(false);
-  console.log(items);
+  // console.log(items);
 
   return (
     <Card style={styles.orderItem}>

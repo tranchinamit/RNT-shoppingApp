@@ -6,7 +6,7 @@ import { bAndroidOS, TouchableCmp } from '../../utils/helpers';
 export default ({ fRemove, ...props }) => {
   const { id, title, price, quantity, sum } = props;
 
-  console.log(props);
+  // console.log(props);
   return (
     <View style={styles.cartItem}>
       <View style={styles.itemData}>

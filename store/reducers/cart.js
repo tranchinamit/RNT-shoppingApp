@@ -78,7 +78,7 @@ export default (state = initialState, { type, payload }) => {
         updatedOrDeleteCartItem = { ...state.items };
         delete updatedOrDeleteCartItem[prodId];
       }
-      console.log(updatedOrDeleteCartItem);
+      // console.log(updatedOrDeleteCartItem);
       return {
         ...state,
         items: updatedOrDeleteCartItem,
@@ -88,7 +88,7 @@ export default (state = initialState, { type, payload }) => {
       return initialState;
     case DELETE_PRODUCT:
       const productId = payload.id;
-      console.log(productId);
+      // console.log(productId);
       if (!state.items[productId]) {
         return state;
       }

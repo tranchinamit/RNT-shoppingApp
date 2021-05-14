@@ -48,6 +48,8 @@ export default ({ navigation }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
+  console.log('in authScreen');
+  console.log(JSON.stringify(navigation))
 
   const dispatch = useDispatch();
 
@@ -71,6 +73,7 @@ export default ({ navigation }) => {
 
   const authHandler = async () => {
     // navigation.navigate('Shop');
+    // console.log(navigation)
 
     const { email, password } = formState.inputValues;
     let action;

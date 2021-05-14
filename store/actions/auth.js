@@ -55,10 +55,10 @@ export const signUp = ({ email, password }) => async dispatch => {
     }
 
     const resData = await res.json();
-    console.log(resData);
+    // console.log(resData);
 
     // store into redux
-    const expirationTime = 60 * 60 * 1000;
+    const expirationTime = resData.expiresIn * 1000;
     const expired = Date.parse(new Date()) + expirationTime;
     dispatch(authenticate({ token: resData.idToken, userId: resData.localId, expired, expirationTime }))
     saveSession({ token: resData.idToken, userId: resData.localId, expired })
@@ -92,13 +92,12 @@ export const signIn = ({ email, password }) => async dispatch => {
       throw new Error(message);
     }
 
-    console.log(res);
+    // console.log(res);
     const resData = await res.json();
-    console.log(resData);
+    // console.log(resData);
 
     // store into redux
-    // const expirationTime = 60 * 60 * 1000;
-    const expirationTime = 10 * 1000;
+    const expirationTime = resData.expiresIn * 1000;
     const expired = Date.parse(new Date()) + expirationTime;
     dispatch(authenticate({ token: resData.idToken, userId: resData.localId, expired, expirationTime }))
     saveSession({ token: resData.idToken, userId: resData.localId, expired })

@@ -25,7 +25,7 @@ export default ({ navigation }) => {
       try {
         const userData = await getSession();
         if (userData && Date.parse(new Date()) < userData.expired) {
-          await dispatch(authenticate(userData));
+          await dispatch(authenticate({ ...userData, expirationTime: 3600 * 1000 }));
           navigation.navigate('Shop');
         } else {
           await clearSession();

@@ -34,10 +34,10 @@ export default () => {
   const [isLoading, setLoading] = useState(false);
 
 
-  console.log(arrItems);
+  // console.log(arrItems);
 
   const handleRemove = (id) => {
-    console.log(id);
+    // console.log(id);
     dispatch(removeFromCart({ id }));
   };
 
