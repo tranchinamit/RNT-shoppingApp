@@ -4,7 +4,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
-  DrawerItemList, DrawerItem
+  DrawerItemList,
+  DrawerItem,
 } from '@react-navigation/drawer';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import createAnimatedSwitchNavigator from 'react-navigation-animated-switch';
@@ -18,6 +19,9 @@ import UserProductScreen from '../screens/user/UserProductScreen';
 import EditProductScreen from '../screens/user/EditProductScreen';
 import AuthScreen from '../screens/user/AuthScreen';
 import StartupScreen from '../screens/StartupScreen';
+import NewPlaceScreen from '../screens/location/NewPlaceScreen';
+import PlaceDetailScreen from '../screens/location/PlaceDetailScreen';
+import PlaceListScreen from '../screens/location/PlaceListScreen';
 
 import { colorBasedOnOS, colorBgBasedOnOS, bAndroidOS } from '../utils/helpers';
 import HeaderButton from '../components/UI/HeaderButton';
@@ -30,15 +34,15 @@ import { logout } from '../store/actions/auth';
 
 const defaultNavOptions = {
   headerStyle: {
-    backgroundColor: colorBgBasedOnOS
+    backgroundColor: colorBgBasedOnOS,
   },
   headerTitleStyle: {
-    fontFamily: 'open-sans-bold'
+    fontFamily: 'open-sans-bold',
   },
   headerBackTitleStyle: {
-    fontFamily: 'open-sans'
+    fontFamily: 'open-sans',
   },
-  headerTintColor: colorBasedOnOS
+  headerTintColor: colorBasedOnOS,
 };
 
 const Stack = createStackNavigator();
@@ -49,10 +53,20 @@ const Drawer = createDrawerNavigator();
 const LeftDrawerContent = (props) => {
   const dispatch = useDispatch();
   return (
-    <DrawerContentScrollView {...props} >
+    <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
       <DrawerItem
-        label={() => <Text style={{ color: Colors.primary, fontFamily: 'open-sans-bold', fontSize: 18 }}>Logout</Text>}
+        label={() => (
+          <Text
+            style={{
+              color: Colors.primary,
+              fontFamily: 'open-sans-bold',
+              fontSize: 18,
+            }}
+          >
+            Logout
+          </Text>
+        )}
         onPress={async () => {
           try {
             await dispatch(logout());
@@ -61,11 +75,13 @@ const LeftDrawerContent = (props) => {
           }
         }}
         style={{ paddingLeft: 40, marginTop: 10 }}
-        icon={() => <Ionicons
-          name={bAndroidOS ? 'md-log-out-outline' : 'ios-log-out-outline'}
-          size={23}
-          color={Colors.primary}
-        />}
+        icon={() => (
+          <Ionicons
+            name={bAndroidOS ? 'md-log-out-outline' : 'ios-log-out-outline'}
+            size={23}
+            color={Colors.primary}
+          />
+        )}
       />
       {/* <DrawerItem
         label="Close drawer"
@@ -81,9 +97,7 @@ const LeftDrawerContent = (props) => {
 
 const OrderNavigation = () => {
   return (
-    <Stack.Navigator
-      screenOptions={defaultNavOptions}
-    >
+    <Stack.Navigator screenOptions={defaultNavOptions}>
       <Stack.Screen
         name="Your Order"
         component={OrderScreen}
@@ -105,11 +119,56 @@ const OrderNavigation = () => {
   );
 };
 
+// Main navigation
+const LocationNavigator = createStackNavigator();
+
+const LocationNavigation = () => {
+  return (
+    <LocationNavigator.Navigator
+      // initialRouteName="Categories"
+      screenOptions={defaultNavOptions}
+    >
+      <LocationNavigator.Screen
+        name="Places"
+        component={PlaceListScreen}
+        options={({ navigation, route }) => ({
+          title: 'All Places',
+          headerRight: () => (
+            <HeaderButtons HeaderButtonComponent={HeaderButton}>
+              <Item
+                title="Add Place"
+                iconName={bAndroidOS ? 'md-add' : 'ios-add'}
+                onPress={() => {
+                  navigation.navigate('NewPlace');
+                }}
+              />
+            </HeaderButtons>
+          ),
+        })}
+      />
+      <LocationNavigator.Screen
+        name="PlaceDetail"
+        component={PlaceDetailScreen}
+        // options={{ title: 'Cart' }}
+      />
+      <LocationNavigator.Screen
+        name="NewPlace"
+        component={NewPlaceScreen}
+        options={({ navigation, route }) => ({
+          title: 'Add Place',
+        })}
+      />
+    </LocationNavigator.Navigator>
+  );
+};
+
 const LeftDrawerNavigation = ({ navigation }) => {
   return (
     <NavigationContainer>
       <Drawer.Navigator
-        drawerContent={(props) => <LeftDrawerContent {...props} mainNavigation={navigation} />}
+        drawerContent={(props) => (
+          <LeftDrawerContent {...props} mainNavigation={navigation} />
+        )}
         drawerContentOptions={{
           activeTintColor: Colors.primary,
           activeBackgroundColor: 'lightgray',
@@ -124,15 +183,15 @@ const LeftDrawerNavigation = ({ navigation }) => {
           style: { margin: 12 },
         }}
         content
-      // drawerStyle={
-      // {
-      // backgroundColor: "#c6cbef",
-      // width: 240,
-      // }
-      // }
-      // 2 options below work together
-      // hideStatusBar={true}
-      // statusBarAnimation={true}
+        // drawerStyle={
+        // {
+        // backgroundColor: "#c6cbef",
+        // width: 240,
+        // }
+        // }
+        // 2 options below work together
+        // hideStatusBar={true}
+        // statusBarAnimation={true}
       >
         <Drawer.Screen
           name="Product"
@@ -167,6 +226,19 @@ const LeftDrawerNavigation = ({ navigation }) => {
             drawerIcon: (drawerConfig) => (
               <Ionicons
                 name={bAndroidOS ? 'md-create' : 'ios-create'}
+                size={23}
+                color={drawerConfig.color}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="Location"
+          component={LocationNavigation}
+          options={{
+            drawerIcon: (drawerConfig) => (
+              <Ionicons
+                name={bAndroidOS ? 'md-map' : 'ios-map'}
                 size={23}
                 color={drawerConfig.color}
               />
@@ -243,9 +315,7 @@ const AdminNavigator = createStackNavigator();
 
 const AdminNavigation = () => {
   return (
-    <AdminNavigator.Navigator
-      screenOptions={defaultNavOptions}
-    >
+    <AdminNavigator.Navigator screenOptions={defaultNavOptions}>
       <AdminNavigator.Screen
         name="Your Product"
         component={UserProductScreen}
@@ -302,7 +372,7 @@ const MainNavigator = createAnimatedSwitchNavigator(
         <Transition.In type="fade" durationMs={500} />
       </Transition.Together>
     ),
-  }
+  },
 );
 const MainNavigatorAndroid = createSwitchNavigator(
   {
@@ -321,8 +391,10 @@ const MainNavigatorAndroid = createSwitchNavigator(
         <Transition.In type="fade" durationMs={500} />
       </Transition.Together>
     ),
-  }
+  },
 );
 
 // Android can run with createSwitchNavigator. So, this is the solution
-export default createAppContainer(bAndroidOS ? MainNavigatorAndroid : MainNavigator);
+export default createAppContainer(
+  bAndroidOS ? MainNavigatorAndroid : MainNavigator,
+);
