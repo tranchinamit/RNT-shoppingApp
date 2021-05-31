@@ -11,6 +11,11 @@
     #"yarn ios": "expo start --ios",
     #"yarn web": "expo start --web",
 
+## How to build the project
+
+    #"expo build:android",
+    #"expo build:ios",
+
 ## Server info
 
     Firebase:

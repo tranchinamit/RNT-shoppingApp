@@ -13,7 +13,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "icon": "./assets/images/logo.png",
@@ -33,7 +35,8 @@
         "VIBRATE",
         "com.sec.android.provider.badge.permission.READ",
         "com.sec.android.provider.badge.permission.WRITE"
-      ]
+      ],
+      "package": "rnt.shopping.expo"
     },
     "web": {
       "favicon": "./assets/logo.png"
